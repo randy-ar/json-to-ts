@@ -92,6 +92,7 @@ export async function promptMode() {
       choices: [
         { name: "📝 Generate TypeScript Types", value: "types" },
         { name: "🎲 Generate Dummy Data", value: "dummy" },
+        { name: "🔧 Generate API Service", value: "service" },
         { name: "✨ Both (Types + Dummy)", value: "both" },
       ],
     },

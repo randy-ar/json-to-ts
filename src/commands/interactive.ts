@@ -6,6 +6,7 @@ import {
 import { Logger } from "../utils/logger.js";
 import { generateTypes } from "./types.js";
 import { generateDummy } from "./dummy.js";
+import { generateService } from "./service.js";
 
 export async function runInteractive() {
   try {
@@ -19,6 +20,8 @@ export async function runInteractive() {
     } else if (mode === "dummy") {
       const answers = await promptDummyGeneration();
       await generateDummy(answers);
+    } else if (mode === "service") {
+      await generateService();
     } else if (mode === "both") {
       // Generate types first
       Logger.info("Step 1: Generating TypeScript types...");
