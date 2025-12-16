@@ -3,7 +3,7 @@ export interface ConverterOptions {
   output?: string;
   name: string;
   optional?: boolean;
-  exportType?: 'interface' | 'type';
+  exportType?: "interface" | "type";
 }
 
 export interface DummyGeneratorOptions {
@@ -21,4 +21,15 @@ export interface TypeInfo {
   isArray: boolean;
   isOptional: boolean;
   children?: Record<string, TypeInfo>;
+}
+
+export interface ParsedTypeName {
+  baseName: string;
+  isArray: boolean;
+}
+
+export interface NestedTypeInfo {
+  typeName: string;
+  properties: Record<string, string>;
+  dependencies: string[];
 }

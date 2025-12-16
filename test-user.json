@@ -1,0 +1,16 @@
+{
+  "name": "John Doe",
+  "age": 30,
+  "location": {
+    "city": "New York",
+    "country": "USA",
+    "coordinates": {
+      "lat": 40.7128,
+      "lng": -74.0060
+    }
+  },
+  "company": {
+    "name": "Tech Corp",
+    "industry": "Technology"
+  }
+}

@@ -1,6 +1,87 @@
 import inquirer from "inquirer";
+import autocompletePrompt from "inquirer-autocomplete-prompt";
 import * as fs from "fs";
 import * as path from "path";
+
+// Register autocomplete prompt
+inquirer.registerPrompt("autocomplete", autocompletePrompt);
+
+/**
+ * Search for files matching the input pattern
+ * Supports folder navigation: type "folder/" to see files inside
+ */
+function searchFiles(input: string = "", extension?: string): string[] {
+  const cwd = process.cwd();
+  const inputPath = input || ".";
+
+  // Resolve the directory to search
+  let searchDir = cwd;
+  let searchPattern = "";
+
+  // Check if input ends with / (user wants to navigate into folder)
+  if (inputPath.endsWith("/")) {
+    searchDir = path.resolve(cwd, inputPath);
+    searchPattern = "";
+  } else if (inputPath.includes("/")) {
+    const parts = inputPath.split("/");
+    searchPattern = parts.pop() || "";
+    const dirPath = parts.join("/");
+    searchDir = path.resolve(cwd, dirPath || ".");
+  } else {
+    searchPattern = inputPath;
+  }
+
+  // If directory doesn't exist, return empty
+  if (!fs.existsSync(searchDir)) {
+    return [];
+  }
+
+  try {
+    const files = fs.readdirSync(searchDir);
+    const results: string[] = [];
+
+    for (const file of files) {
+      // Skip hidden files and common ignore patterns
+      if (file.startsWith(".") && file !== "..") continue;
+
+      const fullPath = path.join(searchDir, file);
+      const relativePath = path.relative(cwd, fullPath);
+
+      try {
+        const stat = fs.statSync(fullPath);
+
+        // Match pattern
+        const matches =
+          !searchPattern ||
+          file.toLowerCase().includes(searchPattern.toLowerCase());
+
+        if (matches) {
+          if (stat.isDirectory()) {
+            // Show folders with / suffix for navigation
+            results.push(relativePath + "/");
+          } else if (!extension || file.endsWith(extension)) {
+            // Only show files with matching extension
+            results.push(relativePath);
+          }
+        }
+      } catch (err) {
+        // Skip files that can't be accessed
+        continue;
+      }
+    }
+
+    // Sort: folders first, then files
+    return results.sort((a, b) => {
+      const aIsDir = a.endsWith("/");
+      const bIsDir = b.endsWith("/");
+      if (aIsDir && !bIsDir) return -1;
+      if (!aIsDir && bIsDir) return 1;
+      return a.localeCompare(b);
+    });
+  } catch (error) {
+    return [];
+  }
+}
 
 export async function promptMode() {
   const { mode } = await inquirer.prompt([
@@ -21,15 +102,24 @@ export async function promptMode() {
 export async function promptTypeGeneration() {
   return await inquirer.prompt([
     {
-      type: "input",
+      type: "autocomplete",
       name: "input",
       message: "Input JSON file path:",
-      validate: (input) => {
-        const resolvedPath = path.resolve(process.cwd(), input);
+      source: async (_answersSoFar: any, input: string) => {
+        return searchFiles(input, ".json");
+      },
+      validate: (input: any) => {
+        // Extract string value from input (could be string or Choice object)
+        const inputValue =
+          typeof input === "string" ? input : input?.value || input;
+        if (!inputValue || typeof inputValue !== "string") {
+          return "Invalid input";
+        }
+        const resolvedPath = path.resolve(process.cwd(), inputValue);
         if (!fs.existsSync(resolvedPath)) {
           return `File not found: ${resolvedPath}`;
         }
-        if (!input.endsWith(".json")) {
+        if (!inputValue.endsWith(".json")) {
           return "File must be a JSON file (.json)";
         }
         return true;
@@ -86,11 +176,20 @@ export async function promptTypeGeneration() {
 export async function promptDummyGeneration() {
   return await inquirer.prompt([
     {
-      type: "input",
+      type: "autocomplete",
       name: "input",
       message: "Input JSON file path:",
-      validate: (input) => {
-        const resolvedPath = path.resolve(process.cwd(), input);
+      source: async (_answersSoFar: any, input: string) => {
+        return searchFiles(input, ".json");
+      },
+      validate: (input: any) => {
+        // Extract string value from input (could be string or Choice object)
+        const inputValue =
+          typeof input === "string" ? input : input?.value || input;
+        if (!inputValue || typeof inputValue !== "string") {
+          return "Invalid input";
+        }
+        const resolvedPath = path.resolve(process.cwd(), inputValue);
         if (!fs.existsSync(resolvedPath)) {
           return `File not found: ${resolvedPath}`;
         }
@@ -98,11 +197,20 @@ export async function promptDummyGeneration() {
       },
     },
     {
-      type: "input",
+      type: "autocomplete",
       name: "types",
       message: "TypeScript types file path:",
-      validate: (input) => {
-        const resolvedPath = path.resolve(process.cwd(), input);
+      source: async (_answersSoFar: any, input: string) => {
+        return searchFiles(input, ".ts");
+      },
+      validate: (input: any) => {
+        // Extract string value from input (could be string or Choice object)
+        const inputValue =
+          typeof input === "string" ? input : input?.value || input;
+        if (!inputValue || typeof inputValue !== "string") {
+          return "Invalid input";
+        }
+        const resolvedPath = path.resolve(process.cwd(), inputValue);
         if (!fs.existsSync(resolvedPath)) {
           return `File not found: ${resolvedPath}`;
         }
@@ -112,14 +220,23 @@ export async function promptDummyGeneration() {
     {
       type: "input",
       name: "typeName",
-      message: "Type name to use:",
-      validate: (input) => input.length > 0 || "Type name is required",
+      message: "Type name to use (e.g., User or User[]):",
+      validate: (input: string) => {
+        if (input.length === 0) {
+          return "Type name is required";
+        }
+        // Allow PascalCase with optional [] suffix
+        if (!/^[A-Z][a-zA-Z0-9]*(\[\])?$/.test(input)) {
+          return "Type name must be in PascalCase (e.g., User, UserData) with optional [] for arrays";
+        }
+        return true;
+      },
     },
     {
       type: "input",
       name: "functionName",
       message: "Dummy function name (camelCase):",
-      validate: (input) => {
+      validate: (input: string) => {
         if (input.length === 0) {
           return "Function name is required";
         }
@@ -143,8 +260,8 @@ export async function promptDummyGeneration() {
       type: "input",
       name: "output",
       message: "Output file path:",
-      when: (answers) => answers.outputMode === "custom",
-      validate: (input) => {
+      when: (answers: any) => answers.outputMode === "custom",
+      validate: (input: string) => {
         if (input.length === 0) {
           return "Output path is required";
         }
