@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "name": "Product",
+  "title": "Sample Product",
+  "price": 100,
+  "description": "This is a sample product",
+  "category": "Electronics",
+  "inStock": true
+}

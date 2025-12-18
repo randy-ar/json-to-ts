@@ -1,4 +1,9 @@
-import { DummyGeneratorOptions, ParsedTypeName, NestedTypeInfo } from "./types";
+import {
+  DummyGeneratorOptions,
+  ParsedTypeName,
+  NestedTypeInfo,
+  DummyGeneratorResult,
+} from "./types";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -466,7 +471,7 @@ function formatJsonAsTypeScript(data: unknown, indent: number = 0): string {
 export function generateDummyData(
   jsonData: unknown,
   options: DummyGeneratorOptions
-): string {
+): string | DummyGeneratorResult {
   const {
     types,
     typeName: rawTypeName,
@@ -474,6 +479,7 @@ export function generateDummyData(
     output,
     async: isAsync = true,
     wrapper = true,
+    count = 1, // Default 1 jika tidak diisi
   } = options;
 
   // Parse type name for array notation
@@ -520,23 +526,96 @@ export function generateDummyData(
   if (wrapper) {
     lines.push(`import { BaseApiResponse } from '@/types/api/api-general';`);
   }
+
+  // Tambahkan import data JSON jika ada output
+  if (output) {
+    const baseName = path.basename(output, ".ts");
+    lines.push(`import dummyData from './${baseName}.json';`);
+  }
+
   lines.push("");
 
-  // Generate single dummy data constant with inline objects and type casting
-  const formattedData = formatJsonAsTypeScriptWithCasting(
-    jsonData,
-    typeMap,
-    typeName,
-    0
-  );
-  const varName = generateVariableName(typeName);
-  lines.push(`const ${varName}: ${typeName} = ${formattedData};`);
-  lines.push("");
+  // Modifikasi data jika count > 1 dan rawTypeName berakhiran []
+  let dataToGenerate: any = jsonData;
+  const isTargetArray = rawTypeName.endsWith("[]");
 
-  // Generate the main function
-  const mainVarName = generateVariableName(typeName);
-  const returnType = isArrayType ? `${typeName}[]` : typeName;
-  const returnValue = isArrayType ? `[${mainVarName}]` : mainVarName;
+  if (count > 1 && isTargetArray) {
+    // Gunakan semua item dari jsonData sebagai template pool
+    const templates = Array.isArray(jsonData) ? jsonData : [jsonData];
+    const templateCount = templates.length;
+
+    const generatedItems = Array.from({ length: count }, (_, i) => {
+      // Ambil template secara bergantian (round-robin) dari pool
+      const template = templates[i % templateCount];
+
+      if (typeof template === "object" && template !== null) {
+        // Mendalam clone template
+        const clonedData = JSON.parse(JSON.stringify(template)) as any;
+
+        // Buat ID unik berdasarkan index global loop i
+        // Kita gunakan offset i untuk memastikan semua ID berbeda meskipun templatnya sama
+        if ("id" in clonedData) {
+          if (typeof clonedData.id === "number") {
+            // Kita coba tebak base ID. Jika template pertama id-nya 1, kita ingin 1, 2, 3...
+            // Tapi agar aman dari clash dengan ID template lain, kita gunakan index i secara langsung
+            // atau tambahkan i ke ID dasar template pertama.
+            const firstId =
+              typeof templates[0].id === "number" ? templates[0].id : 1;
+            clonedData.id = firstId + i;
+          } else if (typeof clonedData.id === "string") {
+            const baseId = clonedData.id.replace(/_\d+$/, "");
+            clonedData.id = `${baseId}_${i + 1}`;
+          }
+        }
+
+        if ("name" in clonedData && typeof clonedData.name === "string") {
+          const baseName = clonedData.name.replace(/\s\d+$/, "");
+          clonedData.name = `${baseName} ${i + 1}`;
+        }
+
+        if ("title" in clonedData && typeof clonedData.title === "string") {
+          const baseTitle = clonedData.title.replace(/\s\d+$/, "");
+          clonedData.title = `${baseTitle} ${i + 1}`;
+        }
+
+        return clonedData;
+      }
+      return template;
+    });
+
+    // Acak urutan (Shuffle) agar tidak terlihat repetitif (Fisher-Yates Shuffle)
+    for (let i = generatedItems.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [generatedItems[i], generatedItems[j]] = [
+        generatedItems[j],
+        generatedItems[i],
+      ];
+    }
+
+    dataToGenerate = generatedItems;
+  } else if (isTargetArray && !Array.isArray(jsonData)) {
+    // Jika user minta array tapi input cuma 1 object, bungkus dalam array
+    dataToGenerate = [jsonData];
+  }
+
+  // Tentukan return type
+  const returnType =
+    (count > 1 && rawTypeName.endsWith("[]")) || isArrayType
+      ? `${typeName}[]`
+      : typeName;
+
+  // Jika ada output, gunakan import. Jika tidak (console), definisikan konstanta lokal.
+  let returnValue = "";
+  if (output) {
+    returnValue = `dummyData as unknown as ${returnType}`;
+  } else {
+    const formattedJson = JSON.stringify(dataToGenerate, null, 2);
+    lines.push(`const dummyData = ${formattedJson};`);
+    lines.push("");
+    returnValue = `dummyData as unknown as ${returnType}`;
+  }
+
+  // Tentukan return value untuk fungsi (sudah diset di atas)
 
   if (isAsync) {
     if (wrapper) {
@@ -604,5 +683,14 @@ export function generateDummyData(
 
   lines.push("");
 
-  return lines.join("\n");
+  const finalCode = lines.join("\n");
+
+  if (!output) {
+    return finalCode;
+  }
+
+  return {
+    code: finalCode,
+    data: dataToGenerate,
+  };
 }

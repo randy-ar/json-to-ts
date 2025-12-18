@@ -248,6 +248,22 @@ export async function promptDummyGeneration() {
       },
     },
     {
+      type: "number",
+      name: "count",
+      message: "Berapa banyak data yang ingin di-generate?",
+      default: 1,
+      when: (answers: any) => answers.typeName.endsWith("[]"),
+      validate: (value: number) => {
+        if (!value || value < 1) {
+          return "Minimal data adalah 1";
+        }
+        if (!Number.isInteger(value)) {
+          return "Jumlah data harus berupa bilangan bulat";
+        }
+        return true;
+      },
+    },
+    {
       type: "list",
       name: "outputMode",
       message: "Output location:",

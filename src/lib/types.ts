@@ -14,6 +14,12 @@ export interface DummyGeneratorOptions {
   output?: string;
   async?: boolean;
   wrapper?: boolean;
+  count?: number; // Jumlah data yang akan di-generate (default: 1)
+}
+
+export interface DummyGeneratorResult {
+  code: string;
+  data: any;
 }
 
 export interface TypeInfo {

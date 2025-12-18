@@ -13,6 +13,7 @@ interface DummyOptions {
   outputMode?: string;
   async?: boolean;
   wrapper?: boolean;
+  count?: number; // Jumlah data yang akan di-generate
 }
 
 export async function generateDummy(options: DummyOptions) {
@@ -49,9 +50,10 @@ export async function generateDummy(options: DummyOptions) {
       output: outputPath,
       async: options.async !== false,
       wrapper: options.wrapper !== false,
+      count: options.count || 1, // Teruskan count dari input user
     };
 
-    const dummyCode = generateDummyData(jsonData, generatorOptions);
+    const result = generateDummyData(jsonData, generatorOptions);
 
     // Output result
     if (outputPath) {
@@ -59,7 +61,23 @@ export async function generateDummy(options: DummyOptions) {
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
       }
-      fs.writeFileSync(outputPath, dummyCode, "utf-8");
+
+      if (typeof result === "string") {
+        fs.writeFileSync(outputPath, result, "utf-8");
+      } else {
+        // Tulis file TS
+        fs.writeFileSync(outputPath, result.code, "utf-8");
+
+        // Tulis file JSON
+        const jsonPath = outputPath.replace(/\.ts$/, ".json");
+        fs.writeFileSync(
+          jsonPath,
+          JSON.stringify(result.data, null, 2),
+          "utf-8"
+        );
+
+        spinner.info(`Data dummy dipisahkan ke: ${path.basename(jsonPath)}`);
+      }
 
       spinner.succeed("Dummy data generated successfully!");
       Logger.file(outputPath);
@@ -75,7 +93,14 @@ export async function generateDummy(options: DummyOptions) {
       Logger.code(`   return await ${options.functionName}(id);`);
     } else {
       spinner.stop();
-      console.log("\n" + dummyCode);
+      if (typeof result === "string") {
+        console.log("\n" + result);
+      } else {
+        console.log("\n// TypeScript Code:");
+        console.log(result.code);
+        console.log("\n// JSON Data:");
+        console.log(JSON.stringify(result.data, null, 2));
+      }
     }
   } catch (error) {
     spinner.fail("Failed to generate dummy data");

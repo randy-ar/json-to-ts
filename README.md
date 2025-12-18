@@ -8,6 +8,7 @@ Interactive CLI tool to convert JSON to TypeScript types and dummy data.
 - 🚀 **CLI Mode** - For automation and scripts
 - 📦 **Type Generation** - Convert JSON to TypeScript interfaces with deduplication
 - 🎲 **Dummy Data** - Generate type-safe dummy data functions
+- 🔢 **Dynamic Count** - Generate multiple data items with automatic variations (NEW!)
 - 🎨 **Colored Output** - Beautiful terminal output with progress indicators
 - ✅ **Validation** - Input validation for file paths and names
 
@@ -89,13 +90,33 @@ json-to-ts dummy \
 ```
 
 **Options:**
+
 - `-i, --input <path>` - Input JSON file (required)
 - `-t, --types <path>` - TypeScript types file (required)
 - `-n, --type-name <name>` - Type name (required)
 - `-f, --function-name <name>` - Function name (required)
 - `-o, --output <path>` - Output file
+- `-c, --count <number>` - Number of data items to generate (default: 1)
 - `--no-async` - Generate synchronous function
 - `--no-wrapper` - Don't wrap in BaseApiResponse
+
+#### Generate Multiple Dummy Data (NEW!)
+
+Generate 5 product items with automatic variations:
+
+```bash
+json-to-ts dummy \
+  -i product.json \
+  -t product.d.ts \
+  -n Product \
+  -f getDummyProducts \
+  -c 5 \
+  -o products.dummy.ts
+```
+
+This will generate an array with 5 items, each with variations in `id`, `name`, and `title` fields.
+
+📖 **[Read full documentation about Dynamic Count Feature →](./DYNAMIC_COUNT_FEATURE.md)**
 
 ## 📝 Examples
 

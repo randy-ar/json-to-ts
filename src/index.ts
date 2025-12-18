@@ -39,6 +39,7 @@ program
   .option("-n, --type-name <name>", "Type name")
   .option("-f, --function-name <name>", "Function name")
   .option("-o, --output <path>", "Output file")
+  .option("-c, --count <number>", "Number of data items to generate")
   .option("--no-async", "Generate synchronous function")
   .option("--no-wrapper", "Don't wrap in BaseApiResponse")
   .action(generateDummy);

@@ -1,0 +1,209 @@
+[
+  {
+    "id": 2,
+    "reference_number": "BOP-LTI-00002",
+    "po_number": "PO-BOP-LTI-00002",
+    "category": "NON-BOP",
+    "supplier": {
+      "id": 2,
+      "name": "BOP Vendor",
+      "alias": "BOP",
+      "category": "BOP"
+    },
+    "realization_date": "2025-12-15T00:00:00Z",
+    "transaction_date": "2025-12-10T00:00:00Z",
+    "created_at": "2025-12-15T08:15:06.565459Z",
+    "updated_at": "2025-12-15T08:16:54.42286Z",
+    "kandang": {
+      "id": 2,
+      "name": "Singaparna 2",
+      "status": "ACTIVE",
+      "capacity": 0,
+      "location": {
+        "id": 1,
+        "name": "Singaparna",
+        "address": "Tasik"
+      }
+    },
+    "pengajuan": {
+      "id": 3,
+      "expense_id": 2,
+      "qty": 20,
+      "price": 14000,
+      "notes": "cata",
+      "nonstock": {
+        "id": 2,
+        "name": "Solar",
+        "flags": []
+      },
+      "created_at": "2025-12-15T08:15:06.55969Z"
+    },
+    "realisasi": {
+      "id": 3,
+      "expense_nonstock_id": 3,
+      "qty": 20,
+      "price": 14000,
+      "notes": "",
+      "nonstock": {
+        "id": 2,
+        "name": "Solar",
+        "flags": []
+      },
+      "created_at": "2025-12-15T08:16:54.417829Z"
+    },
+    "total_pengajuan": 280000,
+    "total_realisasi": 280000,
+    "latest_approval": {
+      "id": 24,
+      "step_number": 4,
+      "step_name": "Realisasi",
+      "action": "CREATED",
+      "notes": null,
+      "action_by": {
+        "id": 1,
+        "id_user": 1,
+        "email": "admin@mbugroup.id",
+        "name": "Super Admin"
+      },
+      "action_at": "2025-12-15T08:16:54.425725Z"
+    }
+  },
+  {
+    "id": 3,
+    "reference_number": "BOP-LTI-00002",
+    "po_number": "PO-BOP-LTI-00002",
+    "category": "NON-BOP",
+    "supplier": {
+      "id": 2,
+      "name": "BOP Vendor",
+      "alias": "BOP",
+      "category": "BOP"
+    },
+    "realization_date": "2025-12-15T00:00:00Z",
+    "transaction_date": "2025-12-10T00:00:00Z",
+    "created_at": "2025-12-15T08:15:06.565459Z",
+    "updated_at": "2025-12-15T08:16:54.42286Z",
+    "kandang": {
+      "id": 2,
+      "name": "Singaparna 2",
+      "status": "ACTIVE",
+      "capacity": 0,
+      "location": {
+        "id": 1,
+        "name": "Singaparna",
+        "address": "Tasik"
+      }
+    },
+    "pengajuan": {
+      "id": 3,
+      "expense_id": 2,
+      "qty": 20,
+      "price": 14000,
+      "notes": "cata",
+      "nonstock": {
+        "id": 2,
+        "name": "Solar",
+        "flags": []
+      },
+      "created_at": "2025-12-15T08:15:06.55969Z"
+    },
+    "realisasi": {
+      "id": 3,
+      "expense_nonstock_id": 3,
+      "qty": 20,
+      "price": 14000,
+      "notes": "",
+      "nonstock": {
+        "id": 2,
+        "name": "Solar",
+        "flags": []
+      },
+      "created_at": "2025-12-15T08:16:54.417829Z"
+    },
+    "total_pengajuan": 280000,
+    "total_realisasi": 280000,
+    "latest_approval": {
+      "id": 24,
+      "step_number": 4,
+      "step_name": "Realisasi",
+      "action": "CREATED",
+      "notes": null,
+      "action_by": {
+        "id": 1,
+        "id_user": 1,
+        "email": "admin@mbugroup.id",
+        "name": "Super Admin"
+      },
+      "action_at": "2025-12-15T08:16:54.425725Z"
+    }
+  },
+  {
+    "id": 4,
+    "reference_number": "BOP-LTI-00002",
+    "po_number": "PO-BOP-LTI-00002",
+    "category": "NON-BOP",
+    "supplier": {
+      "id": 2,
+      "name": "BOP Vendor",
+      "alias": "BOP",
+      "category": "BOP"
+    },
+    "realization_date": "2025-12-15T00:00:00Z",
+    "transaction_date": "2025-12-10T00:00:00Z",
+    "created_at": "2025-12-15T08:15:06.565459Z",
+    "updated_at": "2025-12-15T08:16:54.42286Z",
+    "kandang": {
+      "id": 2,
+      "name": "Singaparna 2",
+      "status": "ACTIVE",
+      "capacity": 0,
+      "location": {
+        "id": 1,
+        "name": "Singaparna",
+        "address": "Tasik"
+      }
+    },
+    "pengajuan": {
+      "id": 3,
+      "expense_id": 2,
+      "qty": 20,
+      "price": 14000,
+      "notes": "cata",
+      "nonstock": {
+        "id": 2,
+        "name": "Solar",
+        "flags": []
+      },
+      "created_at": "2025-12-15T08:15:06.55969Z"
+    },
+    "realisasi": {
+      "id": 3,
+      "expense_nonstock_id": 3,
+      "qty": 20,
+      "price": 14000,
+      "notes": "",
+      "nonstock": {
+        "id": 2,
+        "name": "Solar",
+        "flags": []
+      },
+      "created_at": "2025-12-15T08:16:54.417829Z"
+    },
+    "total_pengajuan": 280000,
+    "total_realisasi": 280000,
+    "latest_approval": {
+      "id": 24,
+      "step_number": 4,
+      "step_name": "Realisasi",
+      "action": "CREATED",
+      "notes": null,
+      "action_by": {
+        "id": 1,
+        "id_user": 1,
+        "email": "admin@mbugroup.id",
+        "name": "Super Admin"
+      },
+      "action_at": "2025-12-15T08:16:54.425725Z"
+    }
+  }
+]
